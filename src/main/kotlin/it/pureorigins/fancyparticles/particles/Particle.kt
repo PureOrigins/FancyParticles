@@ -8,6 +8,7 @@ interface Particle {
     val delay: Long // quanto aspettare dopo che isActive passa a true
     val period: Long // ogni quanto iterare
     val positionOffset: PositionOffset // position relativa a occhi/piedi
+    val name: String
 
     fun isActive(player: PlayerEntity): Boolean // quando switcha a true partono le particelle e il numero di iteration incrementa ogni period
     fun getPosition(iteration: Int): Vec3d
@@ -16,8 +17,4 @@ interface Particle {
     fun getSpeed(iteration: Int): Int
     fun getCount(iteration: Int): Int
     //  particle args
-}
-
-enum class PositionOffset {
-    EYE, FEET
 }

@@ -29,6 +29,8 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
     val configurationVersion: String by project
     modImplementation("com.github.PureOrigins:PureConfiguration:$configurationVersion")
+    val databaseVersion: String by project
+    modImplementation("com.github.PureOrigins:Database:$databaseVersion")
 }
 tasks {
     val javaVersion = JavaVersion.VERSION_16
