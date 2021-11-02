@@ -11,7 +11,6 @@ object FireParticle : Particle {
     override val delay = 0L
     override val period = 1L
     override val positionOffset = PositionOffset.EYE
-    override val name: String = "Fire"
 
     override fun isActive(player: PlayerEntity): Boolean = true
     override fun getPosition(iteration: Int) = Vec3d(cos(0.1 * iteration), 0.4, sin(0.1 * iteration))

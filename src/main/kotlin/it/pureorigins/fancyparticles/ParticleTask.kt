@@ -8,10 +8,12 @@ class ParticleTask(var particle: Particle, var player: ServerPlayerEntity) : Run
     var i: Int = 0
 
     override fun run() {
-        if (isMoving(player)) {
-            val pos = particle.getPosition(i).add(player.pos)
-            val offset = particle.getOffset(i)
-            for(p in player.serverWorld.players)
+        //TODO add if(particle.isActive())
+
+        val pos = particle.getPosition(i).add(particle.positionOffset.getPosition(player))
+        val offset = particle.getOffset(i)
+
+        for (p in player.serverWorld.players)
             player.serverWorld.spawnParticles(
                 p,
                 particle.getParticle(i),
@@ -25,12 +27,8 @@ class ParticleTask(var particle: Particle, var player: ServerPlayerEntity) : Run
                 offset.z,
                 particle.getSpeed(i).toDouble()
             )
-            i++
-        } else i = 0
-    }
+        i++
 
-    private fun isMoving(player: ServerPlayerEntity):Boolean {
-        return (player.prevX != player.x || player.prevY != player.y || player.prevZ != player.z)
     }
 
 }

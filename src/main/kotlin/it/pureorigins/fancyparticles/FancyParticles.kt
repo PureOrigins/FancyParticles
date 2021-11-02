@@ -1,8 +1,9 @@
 package it.pureorigins.fancyparticles
 
 import com.mojang.brigadier.CommandDispatcher
-import it.pureorigins.fancyparticles.particles.FireParticle
 import it.pureorigins.fancyparticles.particles.Particle
+import it.pureorigins.fancyparticles.particles.ParticleEffect
+import it.pureorigins.fancyparticles.particles.ParticleEffects
 import it.pureorigins.framework.configuration.literal
 import it.pureorigins.framework.configuration.success
 import kotlinx.serialization.Serializable
@@ -27,19 +28,21 @@ object FancyParticles : ModInitializer {
         scheduler = Executors.newScheduledThreadPool(4)
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { d: CommandDispatcher<ServerCommandSource?>, _: Boolean ->
-            d.register(literal("fancy") { success { scheduleParticle(FireParticle, source.player) } })
+            d.register(literal("fancy") { success { scheduleParticle(ParticleEffects.CLOUD, source.player) } })
         })
     }
 
-    private fun scheduleParticle(particle: Particle, player: ServerPlayerEntity) {
-        val task = ParticleTask(particle, player)
-        scheduler.scheduleAtFixedRate(task, particle.delay * 50, particle.period * 50, TimeUnit.MILLISECONDS)
+    private fun scheduleParticle(particleEffect: ParticleEffect, player: ServerPlayerEntity) {
+        for (particle in particleEffect.particles) {
+            val task = ParticleTask(particle, player)
+            scheduler.scheduleAtFixedRate(task, particle.delay * 50, particle.period * 50, TimeUnit.MILLISECONDS)
+        }
     }
 
     @Serializable
     data class Config(
         val database: Database = Database(),
-        val titles: ParticleCommands.Config = ParticleCommands.Config()
+        val commands: ParticleCommands.Config = ParticleCommands.Config()
     ) {
         @Serializable
         data class Database(

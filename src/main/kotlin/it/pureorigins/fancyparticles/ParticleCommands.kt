@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import net.minecraft.command.argument.EntityArgumentType.players
 
 class ParticleCommands(private val config: Config) {
+
     val command
         get() = literal(config.commandName) {
             requiresPermission("particles.particles")
@@ -22,7 +23,7 @@ class ParticleCommands(private val config: Config) {
             success { source.sendFeedback(config.set.commandUsage?.templateText()) }
             then(argument("particle", greedyString()) {
                 suggestions {
-                    FancyParticles.getParticles().map{ particle -> particle.name } + config.nullparticleName
+                    TODO()
                 }
                 success {
                     TODO()
