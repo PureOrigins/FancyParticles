@@ -1,5 +1,5 @@
 package it.pureorigins.fancyparticles.particles
 
-data class ParticleEffect(val particles: List<Particle>) {
-    constructor(vararg particles: Particle) : this(listOf(*particles))
+data class ParticleEffect(val particleParts: List<ParticlePart>) {
+    constructor(vararg parts: ParticlePart) : this(listOf(*parts))
 }

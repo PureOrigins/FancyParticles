@@ -1,6 +1,5 @@
-package it.pureorigins.fancyparticles.particles
+package it.pureorigins.fancyparticles.particles.shapes
 
-import it.pureorigins.fancyparticles.PositionOffset.HEAD
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.particle.DustParticleEffect
 import net.minecraft.particle.ParticleEffect
@@ -8,8 +7,7 @@ import net.minecraft.util.math.Vec3d
 import kotlin.math.cos
 import kotlin.math.sin
 
-class SandParticle(delay:Long, period:Long) : Particle(delay, period, HEAD) {
-    constructor():this(0L, 2L)
+object SandParticleShape : ParticleShape {
 
     override fun isActive(player: PlayerEntity): Boolean = true
     override fun getPosition(iteration: Int) = Vec3d(cos(0.1 * iteration), 0.0, sin(0.1 * iteration))

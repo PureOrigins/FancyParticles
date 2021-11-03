@@ -1,29 +1,29 @@
 package it.pureorigins.fancyparticles
 
-import it.pureorigins.fancyparticles.particles.Particle
+import it.pureorigins.fancyparticles.particles.ParticlePart
 import net.minecraft.server.network.ServerPlayerEntity
 
-class ParticleTask(val particle: Particle, val player: ServerPlayerEntity) : Runnable {
+class ParticleTask(private val particlePart: ParticlePart, private val player: ServerPlayerEntity) : Runnable {
 
     var i: Int = 0
 
     override fun run() {
-        if(particle.isActive(player)) {
-            val pos = particle.getPosition(i).add(particle.positionOffset.getPosition(player))
-            val offset = particle.getOffset(i)
+        if(particlePart.shape.isActive(player)) {
+            val pos = particlePart.shape.getPosition(i).add(particlePart.position.getPosition(player))
+            val offset = particlePart.shape.getOffset(i)
             for (p in player.serverWorld.players)
                 player.serverWorld.spawnParticles(
                     p,
-                    particle.getParticle(i),
+                    particlePart.shape.getParticle(i),
                     true,
                     pos.x,
                     pos.y,
                     pos.z,
-                    particle.getCount(i),
+                    particlePart.shape.getCount(i),
                     offset.x,
                     offset.y,
                     offset.z,
-                    particle.getSpeed(i).toDouble()
+                    particlePart.shape.getSpeed(i).toDouble()
                 )
             i++
         } else i = 0
