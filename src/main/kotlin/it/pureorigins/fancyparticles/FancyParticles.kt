@@ -1,7 +1,6 @@
 package it.pureorigins.fancyparticles
 
 import com.mojang.brigadier.CommandDispatcher
-import it.pureorigins.fancyparticles.particles.Particle
 import it.pureorigins.fancyparticles.particles.ParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
 import it.pureorigins.framework.configuration.literal
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 object FancyParticles : ModInitializer {
 
-    fun getParticles(): List<Particle> =
+    fun getParticles(): List<ParticleEffect> =
         TODO()
 
 

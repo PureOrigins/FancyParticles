@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles.particles
+package it.pureorigins.fancyparticles
 
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d

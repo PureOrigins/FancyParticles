@@ -8,8 +8,8 @@ object ParticleEffects {
         return particleEffect
     }
 
-    val STORM = register("storm", ParticleEffect(SandParticle, FireParticle))
-    val CLOUD = register("cloud", ParticleEffect(RainParticle, CloudParticle))
-    val SAND_SPIRAL = register("sand_spiral", ParticleEffect())
+    val STORM = register("storm", ParticleEffect(SandParticle(), FireParticle()))
+    val CLOUD = register("cloud", ParticleEffect(RainParticle(), CloudParticle()))
+    val SAND_SPIRAL = register("sand_spiral", ParticleEffect(SandParticle()))
 
 }
