@@ -2,22 +2,31 @@ package it.pureorigins.fancyparticles.particles
 
 import it.pureorigins.fancyparticles.PositionOffset
 import it.pureorigins.fancyparticles.particles.shapes.ParticleShape
+import net.minecraft.particle.ParticleEffect
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
 
 data class ParticlePart(
     val shape: ParticleShape,
+    val position: PositionOffset = PositionOffset.FEET,
     val delay: Long = 0,
     val period: Long = 1,
-    val position: PositionOffset = PositionOffset.FEET,
-    val offset: Vec3d = Vec3d.ZERO
+    val particleComposition: ParticleComposition = ParticleComposition { _: ServerPlayerEntity, _: Int -> ParticleTypes.NOTE },
+    val offset: Vec3d = Vec3d.ZERO,
+    val isActive: ParticleActivation = ParticleActivation.ALWAYS_ACTIVE
 )
+infix fun ParticleShape.madeOf(particleComposition: ParticleComposition) =
+    ParticlePart(this, particleComposition = particleComposition)
 
-infix fun ParticleShape.delay(delay: Long) = ParticlePart(this, delay = delay)
+infix fun ParticleShape.madeOf(particleEffect: ParticleEffect) =
+    ParticlePart(this, particleComposition = { _, _ -> particleEffect })
+
 infix fun ParticlePart.delay(delay: Long) = copy(delay = delay)
-infix fun ParticleShape.period(period: Long) = ParticlePart(this, period = period)
 infix fun ParticlePart.period(period: Long) = copy(period = period)
-infix fun ParticleShape.at(position: PositionOffset) = ParticlePart(this, position = position)
 infix fun ParticlePart.at(position: PositionOffset) = copy(position = position)
-infix fun ParticleShape.at(offset: Vec3d) = ParticlePart(this, offset = offset)
 infix fun ParticlePart.at(offset: Vec3d) = copy(offset = offset)
-
+infix fun ParticlePart.atX(offsetX: Double) = copy(offset = offset.add(offsetX,0.0,0.0))
+infix fun ParticlePart.atY(offsetY: Double) = copy(offset = offset.add(0.0, offsetY, 0.0))
+infix fun ParticlePart.atZ(offsetZ: Double) = copy(offset = offset.add(0.0, 0.0, offsetZ))
+infix fun ParticlePart.activeIf(particleActivation: ParticleActivation) = copy(isActive = particleActivation)
