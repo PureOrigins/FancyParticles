@@ -8,13 +8,13 @@ class ParticleTask(private val particlePart: ParticlePart, private val player: S
     var i: Int = 0
 
     override fun run() {
-        if(particlePart.shape.isActive(player)) {
+        if(particlePart.particleActivation.isActive(player)) {
             val pos = particlePart.shape.getPosition(i).add(particlePart.position.getPosition(player))
             val offset = particlePart.shape.getOffset(i)
             for (p in player.serverWorld.players)
                 player.serverWorld.spawnParticles(
                     p,
-                    particlePart.shape.getParticle(i),
+                    particlePart.particleComposition.getParticle(player, i),
                     true,
                     pos.x,
                     pos.y,

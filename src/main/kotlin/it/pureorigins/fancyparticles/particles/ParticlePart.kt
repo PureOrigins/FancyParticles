@@ -14,10 +14,8 @@ data class ParticlePart(
     val period: Long = 1,
     val particleComposition: ParticleComposition = ParticleComposition { _: ServerPlayerEntity, _: Int -> ParticleTypes.NOTE },
     val offset: Vec3d = Vec3d.ZERO,
-    val isActive: ParticleActivation = ParticleActivation.ALWAYS_ACTIVE
+    val particleActivation: ParticleActivation = ParticleActivation.ALWAYS_ACTIVE
 )
-infix fun ParticleShape.madeOf(particleComposition: ParticleComposition) =
-    ParticlePart(this, particleComposition = particleComposition)
 
 infix fun ParticleShape.madeOf(particleEffect: ParticleEffect) =
     ParticlePart(this, particleComposition = { _, _ -> particleEffect })
@@ -29,4 +27,4 @@ infix fun ParticlePart.at(offset: Vec3d) = copy(offset = offset)
 infix fun ParticlePart.atX(offsetX: Double) = copy(offset = offset.add(offsetX,0.0,0.0))
 infix fun ParticlePart.atY(offsetY: Double) = copy(offset = offset.add(0.0, offsetY, 0.0))
 infix fun ParticlePart.atZ(offsetZ: Double) = copy(offset = offset.add(0.0, 0.0, offsetZ))
-infix fun ParticlePart.activeIf(particleActivation: ParticleActivation) = copy(isActive = particleActivation)
+infix fun ParticlePart.activeIf(particleActivation: ParticleActivation) = copy(particleActivation = particleActivation)

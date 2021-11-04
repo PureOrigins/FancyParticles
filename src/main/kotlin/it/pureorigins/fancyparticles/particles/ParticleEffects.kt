@@ -2,17 +2,17 @@ package it.pureorigins.fancyparticles.particles
 
 import it.pureorigins.fancyparticles.PositionOffset.FEET
 import it.pureorigins.fancyparticles.PositionOffset.HEAD
-import it.pureorigins.fancyparticles.particles.shapes.ParallelepipedParticle
 import it.pureorigins.fancyparticles.particles.shapes.OrbitalParticle
+import it.pureorigins.fancyparticles.particles.shapes.ParallelepipedParticle
 import net.minecraft.particle.DustParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.ParticleTypes.*
 
 object ParticleEffects {
-    private val map = HashMap<String, ParticleEffect>()
+    val effects = HashMap<String, ParticleEffect>()
 
     private fun register(id: String, particleEffect: ParticleEffect): ParticleEffect {
-        map[id] = particleEffect
+        effects[id] = particleEffect
         return particleEffect
     }
 
@@ -43,4 +43,10 @@ object ParticleEffects {
         ParallelepipedParticle() madeOf HEART delay 12 period 40 at HEAD
     )
 
+    val KNOWLEDGE = register("knowledge", ParallelepipedParticle() madeOf ENCHANT at HEAD)
+
+    val ASHEN = register("ashen", ParallelepipedParticle(0.1, 0.05, 0.1, 5) madeOf SMOKE period 3 at HEAD)
+
+    val SHINING =
+        register("shining", ParallelepipedParticle(0.25, 0.5, 0.25) madeOf HAPPY_VILLAGER period 10 at FEET atY 0.9)
 }

@@ -3,9 +3,9 @@ package it.pureorigins.fancyparticles.particles.shapes
 import net.minecraft.util.math.Vec3d
 
 class ParallelepipedParticle(
-    private val x: Double = 0.2,
+    private val x: Double = 0.0,
     private val y: Double = 0.0,
-    private val z: Double = 0.2,
+    private val z: Double = 0.0,
     private val count: Int = 1
 ) : ParticleShape {
 

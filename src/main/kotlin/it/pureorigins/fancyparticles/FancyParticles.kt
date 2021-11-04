@@ -34,9 +34,8 @@ object FancyParticles : ModInitializer {
         scheduler = Executors.newScheduledThreadPool(4)
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { d: CommandDispatcher<ServerCommandSource?>, _: Boolean ->
-            d.register(literal("fancy") { success { scheduleParticle(ParticleEffects.CLOUD, source.player) } })
-            d.register(literal("fancy1") { success { scheduleParticle(ParticleEffects.MUSIC, source.player) } })
-            d.register(literal("fancy2") { success { scheduleParticle(ParticleEffects.LOVE, source.player) } })
+            for (e in ParticleEffects.effects)
+                d.register(literal(e.key) { success { scheduleParticle(e.value, source.player) } })
         })
 
         ServerPlayConnectionEvents.DISCONNECT.register { handler: ServerPlayNetworkHandler, _: MinecraftServer ->
