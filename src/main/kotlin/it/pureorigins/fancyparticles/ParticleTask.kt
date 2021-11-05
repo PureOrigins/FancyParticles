@@ -8,8 +8,10 @@ class ParticleTask(private val particlePart: ParticlePart, private val player: S
     var i: Int = 0
 
     override fun run() {
-        if(particlePart.particleActivation.isActive(player)) {
-            val pos = particlePart.shape.getPosition(i).add(particlePart.position.getPosition(player))
+        if (particlePart.particleActivation.isActive(player)) {
+            val pos = particlePart.shape.getPosition(i)
+                .add(particlePart.positionReference.getPosition(player))
+                .add(particlePart.positionOffset)
             val offset = particlePart.shape.getOffset(i)
             for (p in player.serverWorld.players)
                 player.serverWorld.spawnParticles(
@@ -23,7 +25,7 @@ class ParticleTask(private val particlePart: ParticlePart, private val player: S
                     offset.x,
                     offset.y,
                     offset.z,
-                    particlePart.shape.getSpeed(i).toDouble()
+                    particlePart.shape.getSpeed(i)
                 )
             i++
         } else i = 0

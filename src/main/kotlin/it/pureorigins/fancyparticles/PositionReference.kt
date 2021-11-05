@@ -3,7 +3,7 @@ package it.pureorigins.fancyparticles
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
 
-enum class PositionOffset {
+enum class PositionReference {
     EYE, FEET, HEAD;
 
     fun getPosition(player: ServerPlayerEntity): Vec3d? = when (this) {
