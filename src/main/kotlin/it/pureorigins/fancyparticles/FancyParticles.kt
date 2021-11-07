@@ -1,6 +1,5 @@
 package it.pureorigins.fancyparticles
 
-import com.mojang.brigadier.CommandDispatcher
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
@@ -8,8 +7,9 @@ import it.pureorigins.framework.configuration.*
 import kotlinx.serialization.Serializable
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
-import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
@@ -26,22 +26,32 @@ object FancyParticles : ModInitializer {
     fun getParticle(id: Int): NamedParticleEffect? = transaction(database) { ParticlesTable.getById(id) }
     fun getParticle(name: String): Pair<Int, NamedParticleEffect>? =
         transaction(database) { ParticlesTable.getByName(name) }
+    fun getAllNames(): Set<String> = transaction(database) { ParticlesTable.getAllNames() }
+    fun addParticle(playerUniqueId: UUID, titleId: Int): Boolean = transaction(database) { PlayerParticlesTable.add(playerUniqueId, titleId) }
+    fun removeParticle(playerUniqueId: UUID, titleId: Int): Boolean = transaction(database) { PlayerParticlesTable.remove(playerUniqueId, titleId) }
+    fun getPlayerParticles(playerUniqueId: UUID): Map<Int, NamedParticleEffect> =
+        transaction(database) { PlayerParticlesTable.getParticles(playerUniqueId) }
 
     fun getPlayersCount(): Long = transaction(database) { PlayersTable.count() }
     fun getCurrentParticle(playerUniqueId: UUID): Pair<Int, NamedParticleEffect>? =
         transaction(database) { PlayersTable.getCurrentParticle(playerUniqueId) }
+
     fun setCurrentParticle(playerUniqueId: UUID, titleId: Int?): Boolean =
         transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, titleId) }
 
 
     lateinit var scheduler: ScheduledExecutorService
+    lateinit var server: MinecraftServer
     internal lateinit var database: Database private set
     override fun onInitialize() {
-        val config = json.readFileAs(configFile("fancyparticles.json"), Config())
+        val (db, commands) = json.readFileAs(configFile("fancyparticles.json"), Config())
         scheduler = Executors.newScheduledThreadPool(4)
-        database = Database.connect(config.database.url, user = config.database.username, password = config.database.password)
-        transaction(database) {
-            createMissingTablesAndColumns(PlayersTable, ParticlesTable)
+        require(db.url.isNotEmpty()) { "Database url is empty" }
+        database = Database.connect(db.url, user = db.username, password = db.password)
+        transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable) }
+        ServerLifecycleEvents.SERVER_STARTED.register { server = it }
+        CommandRegistrationCallback.EVENT.register { d, _ ->
+            d.register(ParticleCommands(commands).command)
         }
 
         //Remove all particle tasks when player disconnects
@@ -53,10 +63,10 @@ object FancyParticles : ModInitializer {
 
 
         //Test commands
-        CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { d: CommandDispatcher<ServerCommandSource?>, _: Boolean ->
+        CommandRegistrationCallback.EVENT.register { d, _ ->
             for (e in ParticleEffects.effects)
                 d.register(literal(e.key) { success { scheduleParticle(e.value, source.player) } })
-        })
+        }
     }
 
     private fun scheduleParticle(particleEffect: ParticleEffect, player: ServerPlayerEntity) {
@@ -82,7 +92,7 @@ object FancyParticles : ModInitializer {
     ) {
         @Serializable
         data class Database(
-            val url: String = "",
+            val url: String = "sqlite:test.db",
             val username: String = "",
             val password: String = ""
         )
