@@ -92,7 +92,8 @@ object FancyParticles : ModInitializer {
     ) {
         @Serializable
         data class Database(
-            val url: String = "jdbc:sqlite:test.db",
+            //Default db
+            val url: String = "jdbc:sqlite:fancyparticles.db",
             val username: String = "",
             val password: String = ""
         )
