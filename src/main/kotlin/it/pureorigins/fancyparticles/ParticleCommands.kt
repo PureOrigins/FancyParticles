@@ -29,21 +29,21 @@ class ParticleCommands(private val config: Config) {
                         .map { (_, particle) -> particle.name } + config.nullparticleName
                 }
                 success {
-                    val titleName = getString(this, "particle")
-                    if (titleName == config.nullparticleName) {
+                    val particleName = getString(this, "particle")
+                    if (particleName == config.nullparticleName) {
                         FancyParticles.setCurrentParticle(source.player.uuid, null)
                         return@success source.sendFeedback(config.set.success?.templateText("particle" to null))
                     }
-                    val (id, title) = FancyParticles.getParticle(titleName)
+                    val (id, particle) = FancyParticles.getParticle(particleName)
                         ?: return@success source.sendFeedback(config.set.particleNotFound?.templateText())
-                    val playerTitles = FancyParticles.getPlayerParticles(source.player.uuid)
-                    if (id !in playerTitles) return@success source.sendFeedback(
+                    val playerparticles = FancyParticles.getPlayerParticles(source.player.uuid)
+                    if (id !in playerparticles) return@success source.sendFeedback(
                         config.set.particleNotOwned?.templateText(
-                            "title" to title
+                            "particle" to particle
                         )
                     )
                     FancyParticles.setCurrentParticle(source.player.uuid, id)
-                    source.sendFeedback(config.set.success?.templateText("title" to title))
+                    source.sendFeedback(config.set.success?.templateText("particle" to particle))
                 }
             })
         }
@@ -52,12 +52,12 @@ class ParticleCommands(private val config: Config) {
         get() = literal(config.info.commandName) {
             requiresPermission("fancyparticles.particles.info")
             success {
-                val titles = FancyParticles.getPlayerParticles(source.player.uuid).values
-                val currentTitle = FancyParticles.getCurrentParticle(source.player.uuid)?.second
+                val particles = FancyParticles.getPlayerParticles(source.player.uuid).values
+                val currentparticle = FancyParticles.getCurrentParticle(source.player.uuid)?.second
                 source.sendFeedback(
                     config.info.message?.templateText(
-                        "titles" to titles,
-                        "currentTitle" to currentTitle
+                        "particles" to particles,
+                        "currentparticle" to currentparticle
                     )
                 )
             }
@@ -74,11 +74,11 @@ class ParticleCommands(private val config: Config) {
                     }
                     success {
                         val players = getPlayers(this, "targets")
-                        val titleName = getString(this, "title")
-                        val (id, title) = FancyParticles.getParticle(titleName) ?: return@success source.sendFeedback(config.add.particleNotFound?.templateText())
+                        val particleName = getString(this, "particle")
+                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendFeedback(config.add.particleNotFound?.templateText())
                         val success = players.filter { FancyParticles.addParticle(it.uuid, id) }
-                        if (success.isEmpty()) source.sendFeedback(config.add.particleAlreadyOwned?.templateText("title" to title))
-                        else source.sendFeedback(config.add.success?.templateText("title" to title, "players" to players))
+                        if (success.isEmpty()) source.sendFeedback(config.add.particleAlreadyOwned?.templateText("particle" to particle))
+                        else source.sendFeedback(config.add.success?.templateText("particle" to particle, "players" to players))
                     }
                 })
             })
@@ -95,13 +95,13 @@ class ParticleCommands(private val config: Config) {
                     }
                     success {
                         val players = getPlayers(this, "targets")
-                        val titleName = getString(this, "title")
-                        val (id, title) = FancyParticles.getParticle(titleName) ?: return@success source.sendFeedback(config.remove.particleNotFound?.templateText())
+                        val particleName = getString(this, "particle")
+                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendFeedback(config.remove.particleNotFound?.templateText())
                         val success = players.filter {
                             FancyParticles.removeParticle(it.uuid, id)
                         }
-                        if (success.isEmpty()) source.sendFeedback(config.remove.particleNotOwned?.templateText("title" to title))
-                        else source.sendFeedback(config.remove.success?.templateText("title" to title, "players" to players))
+                        if (success.isEmpty()) source.sendFeedback(config.remove.particleNotOwned?.templateText("particle" to particle))
+                        else source.sendFeedback(config.remove.success?.templateText("particle" to particle, "players" to players))
                     }
                 })
             })

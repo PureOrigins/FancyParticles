@@ -42,13 +42,13 @@ object FancyParticles : ModInitializer {
 
     lateinit var scheduler: ScheduledExecutorService
     lateinit var server: MinecraftServer
-    internal lateinit var database: Database private set
+    private lateinit var database: Database private set
     override fun onInitialize() {
         val (db, commands) = json.readFileAs(configFile("fancyparticles.json"), Config())
         scheduler = Executors.newScheduledThreadPool(4)
         require(db.url.isNotEmpty()) { "Database url is empty" }
         database = Database.connect(db.url, user = db.username, password = db.password)
-        transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable) }
+        transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable, PlayerParticlesTable) }
         ServerLifecycleEvents.SERVER_STARTED.register { server = it }
         CommandRegistrationCallback.EVENT.register { d, _ ->
             d.register(ParticleCommands(commands).command)
@@ -92,7 +92,7 @@ object FancyParticles : ModInitializer {
     ) {
         @Serializable
         data class Database(
-            val url: String = "sqlite:test.db",
+            val url: String = "jdbc:sqlite:test.db",
             val username: String = "",
             val password: String = ""
         )
