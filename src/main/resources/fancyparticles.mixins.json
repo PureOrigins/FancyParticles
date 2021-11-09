@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "it.pureorigins.titles.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "AdvancementRewardsAccessor",
+    "AdvancementRewardsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
