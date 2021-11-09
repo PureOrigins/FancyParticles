@@ -1,4 +1,4 @@
-package mixin;
+package it.pureorigins.fancyparticles.mixin;
 
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.server.function.CommandFunction.LazyContainer;

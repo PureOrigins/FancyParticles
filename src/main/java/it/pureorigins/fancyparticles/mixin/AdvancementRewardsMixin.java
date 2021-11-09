@@ -1,4 +1,4 @@
-package mixin;
+package it.pureorigins.fancyparticles.mixin;
 
 import com.google.gson.JsonObject;
 import it.pureorigins.fancyparticles.advancements.ParticlesAdvancementRewards;

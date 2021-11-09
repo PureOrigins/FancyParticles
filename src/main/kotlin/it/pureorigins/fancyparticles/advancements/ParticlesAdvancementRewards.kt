@@ -5,7 +5,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import it.pureorigins.fancyparticles.FancyParticles
-import mixin.AdvancementRewardsAccessor
+import it.pureorigins.fancyparticles.mixin.AdvancementRewardsAccessor
 import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.server.function.CommandFunction
 import net.minecraft.server.network.ServerPlayerEntity

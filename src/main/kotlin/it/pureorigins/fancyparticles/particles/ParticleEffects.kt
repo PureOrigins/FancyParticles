@@ -8,7 +8,6 @@ import net.minecraft.block.Blocks
 import net.minecraft.particle.BlockStateParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.ParticleTypes.*
-import org.apache.logging.log4j.LogManager
 import kotlin.math.PI
 
 object ParticleEffects {
@@ -36,7 +35,17 @@ object ParticleEffects {
 
     )
     val SAND_SPIRAL = register(
-        "sand_spiral", OrbitalParticle(angularSpeed = PI/18) madeOf BlockStateParticleEffect(FALLING_DUST, Blocks.SAND.defaultState) period 2 at HEAD
+        "sand_spiral",
+        OrbitalParticle(angularSpeed = PI / 18) madeOf BlockStateParticleEffect(
+            FALLING_DUST,
+            Blocks.SAND.defaultState
+        ) period 2 at HEAD
+    )
+
+    val FIRE_SPIRAL = register(
+        "fire_spiral", OrbitalParticle(angularSpeed = PI / 18) madeOf FLAME period 2 at FEET,
+        OrbitalParticle(angularSpeed = PI / 18, initAlpha = PI) madeOf FLAME period 2 at FEET,
+        ParallelepipedParticle(0.5, 0.1, 0.5, count = 10) madeOf SMOKE period 2 at FEET
     )
 
     val LOVE = register(
@@ -54,7 +63,6 @@ object ParticleEffects {
         register("shining", ParallelepipedParticle(0.25, 0.5, 0.25) madeOf HAPPY_VILLAGER period 10 at FEET atY 0.9)
 
     fun fromString(string: String): ParticleEffect {
-        LogManager.getLogger().info("Looking for effect $string")
         return effects.getOrDefault(string, ParticleEffect())
     }
 }
