@@ -28,7 +28,6 @@ object PlayersTable : Table("players") {
 }
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
-    get(ParticlesTable.id),
     get(ParticlesTable.name),
     Text.of(get(ParticlesTable.title)),
     ParticleEffects.fromString(get(ParticlesTable.string_id))

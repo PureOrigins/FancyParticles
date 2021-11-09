@@ -40,7 +40,7 @@ object FancyParticles : ModInitializer {
         transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, particleId) }
 
 
-    lateinit var scheduler: ScheduledExecutorService
+    private lateinit var scheduler: ScheduledExecutorService
     lateinit var server: MinecraftServer
     private lateinit var database: Database private set
     override fun onInitialize() {
