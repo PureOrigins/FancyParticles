@@ -8,6 +8,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.particle.BlockStateParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.ParticleTypes.*
+import org.apache.logging.log4j.LogManager
 import kotlin.math.PI
 
 object ParticleEffects {
@@ -53,6 +54,7 @@ object ParticleEffects {
         register("shining", ParallelepipedParticle(0.25, 0.5, 0.25) madeOf HAPPY_VILLAGER period 10 at FEET atY 0.9)
 
     fun fromString(string: String): ParticleEffect {
+        LogManager.getLogger().info("Looking for effect $string")
         return effects.getOrDefault(string, ParticleEffect())
     }
 }

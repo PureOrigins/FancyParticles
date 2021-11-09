@@ -6,6 +6,7 @@ import it.pureorigins.framework.configuration.*
 import kotlinx.serialization.Serializable
 import net.minecraft.command.argument.EntityArgumentType.getPlayers
 import net.minecraft.command.argument.EntityArgumentType.players
+import org.apache.logging.log4j.LogManager
 
 class ParticleCommands(private val config: Config) {
 
@@ -32,6 +33,7 @@ class ParticleCommands(private val config: Config) {
                     val particleName = getString(this, "particle")
                     if (particleName == config.nullparticleName) {
                         FancyParticles.setCurrentParticle(source.player.uuid, null)
+                        FancyParticles.clearTasks(source.player)
                         return@success source.sendFeedback(config.set.success?.templateText("particle" to null))
                     }
                     val (id, particle) = FancyParticles.getParticle(particleName)
@@ -43,6 +45,8 @@ class ParticleCommands(private val config: Config) {
                         )
                     )
                     FancyParticles.setCurrentParticle(source.player.uuid, id)
+                    LogManager.getLogger().info("${source.player.name} set particle to $particle")
+                    FancyParticles.scheduleParticle(particle.particleEffect, source.player)
                     source.sendFeedback(config.set.success?.templateText("particle" to particle))
                 }
             })

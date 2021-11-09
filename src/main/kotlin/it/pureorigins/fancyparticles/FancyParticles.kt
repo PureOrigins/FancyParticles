@@ -27,8 +27,8 @@ object FancyParticles : ModInitializer {
     fun getParticle(name: String): Pair<Int, NamedParticleEffect>? =
         transaction(database) { ParticlesTable.getByName(name) }
     fun getAllNames(): Set<String> = transaction(database) { ParticlesTable.getAllNames() }
-    fun addParticle(playerUniqueId: UUID, titleId: Int): Boolean = transaction(database) { PlayerParticlesTable.add(playerUniqueId, titleId) }
-    fun removeParticle(playerUniqueId: UUID, titleId: Int): Boolean = transaction(database) { PlayerParticlesTable.remove(playerUniqueId, titleId) }
+    fun addParticle(playerUniqueId: UUID, particleId: Int): Boolean = transaction(database) { PlayerParticlesTable.add(playerUniqueId, particleId) }
+    fun removeParticle(playerUniqueId: UUID, particleId: Int): Boolean = transaction(database) { PlayerParticlesTable.remove(playerUniqueId, particleId) }
     fun getPlayerParticles(playerUniqueId: UUID): Map<Int, NamedParticleEffect> =
         transaction(database) { PlayerParticlesTable.getParticles(playerUniqueId) }
 
@@ -36,8 +36,8 @@ object FancyParticles : ModInitializer {
     fun getCurrentParticle(playerUniqueId: UUID): Pair<Int, NamedParticleEffect>? =
         transaction(database) { PlayersTable.getCurrentParticle(playerUniqueId) }
 
-    fun setCurrentParticle(playerUniqueId: UUID, titleId: Int?): Boolean =
-        transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, titleId) }
+    fun setCurrentParticle(playerUniqueId: UUID, particleId: Int?): Boolean =
+        transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, particleId) }
 
 
     lateinit var scheduler: ScheduledExecutorService
@@ -69,7 +69,7 @@ object FancyParticles : ModInitializer {
         }
     }
 
-    private fun scheduleParticle(particleEffect: ParticleEffect, player: ServerPlayerEntity) {
+    fun scheduleParticle(particleEffect: ParticleEffect, player: ServerPlayerEntity) {
         clearTasks(player)
         playerTasks[player.uuid] = ArrayList()
         for (part in particleEffect.particleParts) {
@@ -79,7 +79,7 @@ object FancyParticles : ModInitializer {
         }
     }
 
-    private fun clearTasks(player: ServerPlayerEntity) {
+    public fun clearTasks(player: ServerPlayerEntity) {
         if (playerTasks.containsKey(player.uuid))
             for (t in playerTasks[player.uuid]!!) t.cancel(false)
         playerTasks.remove(player.uuid)

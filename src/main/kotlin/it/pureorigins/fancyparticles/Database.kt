@@ -28,10 +28,10 @@ object PlayersTable : Table("players") {
 }
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
-    0,
+    get(ParticlesTable.id),
     get(ParticlesTable.name),
     Text.of(get(ParticlesTable.title)),
-    ParticleEffects.fromString(ParticlesTable.string_id.toString())
+    ParticleEffects.fromString(get(ParticlesTable.string_id))
 )
 
 object PlayerParticlesTable : Table("player_particles_table") {
@@ -54,7 +54,7 @@ object PlayerParticlesTable : Table("player_particles_table") {
 }
 
 object ParticlesTable : Table("particles_table") {
-    val id = integer("id")
+    val id = integer("id").autoIncrement()
     val name = varchar("name", length = 50)
     val title = varchar("title", length = 50)
     val string_id = varchar("string_id", length = 50)
