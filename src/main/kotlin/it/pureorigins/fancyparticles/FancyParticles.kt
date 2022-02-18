@@ -2,15 +2,11 @@ package it.pureorigins.fancyparticles
 
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffect
-import it.pureorigins.fancyparticles.particles.ParticleEffects
-import it.pureorigins.framework.configuration.*
+import it.pureorigins.framework.configuration.json
+import it.pureorigins.framework.configuration.readFileAs
 import kotlinx.serialization.Serializable
-import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.network.ServerPlayerEntity
+import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-object FancyParticles : ModInitializer {
+object FancyParticles : JavaPlugin() {
 
     private val playerTasks = HashMap<UUID, ArrayList<ScheduledFuture<*>>>()
     fun getParticle(id: Int): NamedParticleEffect? = transaction(database) { ParticlesTable.getById(id) }
@@ -41,49 +37,32 @@ object FancyParticles : ModInitializer {
 
 
     private lateinit var scheduler: ScheduledExecutorService
-    lateinit var server: MinecraftServer
-    private lateinit var database: Database private set
-    override fun onInitialize() {
-        val (db, commands) = json.readFileAs(configFile("fancyparticles.json"), Config())
+    private lateinit var database: Database
+    override fun onEnable() {
+        val (db, commands) = json.readFileAs(it.pureorigins.framework.configuration.configFile("fancyparticles.json"), Config())
         scheduler = Executors.newScheduledThreadPool(4)
         require(db.url.isNotEmpty()) { "Database url is empty" }
         database = Database.connect(db.url, user = db.username, password = db.password)
         transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable, PlayerParticlesTable) }
-        ServerLifecycleEvents.SERVER_STARTED.register { server = it }
-        CommandRegistrationCallback.EVENT.register { d, _ ->
-            d.register(ParticleCommands(commands).command)
-        }
 
-        //Remove all particle tasks when player disconnects
-        ServerPlayConnectionEvents.DISCONNECT.register { handler, _ -> clearTasks(handler.player) }
-
-        ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
-            getCurrentParticle(handler.player.uuid)?.second?.let { scheduleParticle(it.particleEffect, handler.player) }
-        }
-
-
-        //Test commands
-        CommandRegistrationCallback.EVENT.register { d, _ ->
-            for (e in ParticleEffects.effects)
-                d.register(literal(e.key) { success { scheduleParticle(e.value, source.player) } })
-        }
     }
 
-    fun scheduleParticle(particleEffect: ParticleEffect, player: ServerPlayerEntity) {
+    fun scheduleParticle(particleEffect: ParticleEffect, player: Player) {
         clearTasks(player)
-        playerTasks[player.uuid] = ArrayList()
+        playerTasks[player.uniqueId] = ArrayList()
         for (part in particleEffect.particleParts) {
             val task = ParticleTask(part, player)
             val t = scheduler.scheduleAtFixedRate(task, part.delay * 50, part.period * 50, TimeUnit.MILLISECONDS)
-            playerTasks[player.uuid]?.add(t)
+            playerTasks[player.uniqueId]?.add(t)
         }
     }
 
-    public fun clearTasks(player: ServerPlayerEntity) {
-        if (playerTasks.containsKey(player.uuid))
-            for (t in playerTasks[player.uuid]!!) t.cancel(false)
-        playerTasks.remove(player.uuid)
+    fun clearTasks(player: Player) {
+        if (playerTasks.containsKey(player.uniqueId))
+            for (t in playerTasks[player.uniqueId]!!) t.cancel(false)
+        playerTasks.remove(player.uniqueId)
     }
+
 
     @Serializable
     data class Config(

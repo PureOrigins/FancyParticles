@@ -1,6 +1,6 @@
 package it.pureorigins.fancyparticles.particles.shapes
 
-import net.minecraft.util.math.Vec3d
+import org.bukkit.util.Vector
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -12,9 +12,9 @@ class OrbitalParticle(
     ParticleShape {
 
     override fun getPosition(iteration: Int) =
-        Vec3d(r * cos(angularSpeed * iteration + initAlpha), 0.0, r * sin(angularSpeed * iteration + initAlpha))
+        Vector(r * cos(angularSpeed * iteration + initAlpha), 0.0, r * sin(angularSpeed * iteration + initAlpha))
 
-    override fun getOffset(iteration: Int): Vec3d = Vec3d.ZERO
+    override fun getOffset(iteration: Int): Vector = Vector(0,0,0)
     override fun getSpeed(iteration: Int) = 0.0
     override fun getCount(iteration: Int) = 1
 }

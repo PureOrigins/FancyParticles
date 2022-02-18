@@ -1,5 +1,5 @@
 package it.pureorigins.fancyparticles.particles
 
-import net.minecraft.text.Text
+import net.md_5.bungee.api.chat.TextComponent
 
-data class NamedParticleEffect(val name: String, val title: Text, val particleEffect: ParticleEffect)
+data class NamedParticleEffect(val name: String, val title: TextComponent, val particleEffect: ParticleEffect)

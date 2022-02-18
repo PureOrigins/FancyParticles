@@ -1,14 +1,14 @@
 package it.pureorigins.fancyparticles
 
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Vec3d
+import org.bukkit.entity.Player
+import org.bukkit.util.Vector
 
 enum class PositionReference {
     EYE, FEET, HEAD;
 
-    fun getPosition(player: ServerPlayerEntity): Vec3d? = when (this) {
-        EYE -> player.eyePos
-        FEET -> player.pos
-        HEAD -> player.pos.add(0.0, player.height.toDouble(), 0.0)
+    fun getPosition(player: Player): Vector = when (this) {
+        EYE -> player.eyeLocation.toVector()
+        FEET -> player.location.toVector()
+        HEAD -> player.location.toVector().add(Vector(0.0, player.height, 0.0))
     }
 }

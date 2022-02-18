@@ -1,10 +1,10 @@
 package it.pureorigins.fancyparticles.particles.shapes
 
-import net.minecraft.util.math.Vec3d
+import org.bukkit.util.Vector
 
 interface ParticleShape {
-    fun getPosition(iteration: Int): Vec3d
-    fun getOffset(iteration: Int): Vec3d
+    fun getPosition(iteration: Int): Vector
+    fun getOffset(iteration: Int): Vector
     fun getSpeed(iteration: Int): Double
     fun getCount(iteration: Int): Int
 }

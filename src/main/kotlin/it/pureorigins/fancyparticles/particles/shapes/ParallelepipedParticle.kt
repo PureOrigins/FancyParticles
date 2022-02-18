@@ -1,6 +1,6 @@
 package it.pureorigins.fancyparticles.particles.shapes
 
-import net.minecraft.util.math.Vec3d
+import org.bukkit.util.Vector
 
 class ParallelepipedParticle(
     private val x: Double = 0.0,
@@ -10,8 +10,8 @@ class ParallelepipedParticle(
     private val speed: Double = 0.0
 ) : ParticleShape {
 
-    override fun getPosition(iteration: Int): Vec3d = Vec3d.ZERO
-    override fun getOffset(iteration: Int): Vec3d = Vec3d(x, y, z)
+    override fun getPosition(iteration: Int): Vector = Vector(0,0,0)
+    override fun getOffset(iteration: Int): Vector = Vector(x, y, z)
     override fun getSpeed(iteration: Int) = speed
     override fun getCount(iteration: Int) = count
 }

@@ -2,7 +2,8 @@ package it.pureorigins.fancyparticles
 
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
-import net.minecraft.text.Text
+import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.chat.ComponentSerializer
 import org.jetbrains.exposed.sql.*
 import java.util.*
 
@@ -29,7 +30,7 @@ object PlayersTable : Table("players") {
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
     get(ParticlesTable.name),
-    Text.of(get(ParticlesTable.title)),
+    TextComponent(*ComponentSerializer.parse(get(ParticlesTable.title))),
     ParticleEffects.fromString(get(ParticlesTable.string_id))
 )
 
@@ -70,13 +71,13 @@ object ParticlesTable : Table("particles_table") {
     fun add(particle: NamedParticleEffect): Int = insert {
         it[name] = particle.name
         it[string_id] = particle.particleEffect.stringId
-        it[title] = Text.Serializer.toJson(particle.title)
+        it[title] = ComponentSerializer.toString(particle.title)
     } get id
 
     fun remove(id: Int): Boolean = deleteWhere { ParticlesTable.id eq id } > 0
     fun update(id: Int, particle: NamedParticleEffect): Boolean = update({ ParticlesTable.id eq id }) {
         it[name] = particle.name
         it[string_id] = particle.particleEffect.stringId
-        it[title] = Text.Serializer.toJson(particle.title)
+        it[title] = ComponentSerializer.toString(particle.title)
     } > 0
 }

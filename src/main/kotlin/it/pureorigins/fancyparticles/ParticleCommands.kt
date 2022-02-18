@@ -1,16 +1,10 @@
 package it.pureorigins.fancyparticles
 
-import com.mojang.brigadier.arguments.StringArgumentType.getString
-import com.mojang.brigadier.arguments.StringArgumentType.greedyString
-import it.pureorigins.framework.configuration.*
 import kotlinx.serialization.Serializable
-import net.minecraft.command.argument.EntityArgumentType.getPlayers
-import net.minecraft.command.argument.EntityArgumentType.players
-import org.apache.logging.log4j.LogManager
 
 class ParticleCommands(private val config: Config) {
 
-    val command
+/*    val command
         get() = literal(config.commandName) {
             requiresPermission("fancyparticles.particles")
             success { source.sendFeedback(config.commandUsage?.templateText()) }
@@ -109,7 +103,7 @@ class ParticleCommands(private val config: Config) {
                     }
                 })
             })
-        }
+        }*/
 
     @Serializable
     data class Config(
