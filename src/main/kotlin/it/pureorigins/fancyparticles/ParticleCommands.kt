@@ -1,10 +1,16 @@
 package it.pureorigins.fancyparticles
 
+import com.mojang.brigadier.arguments.StringArgumentType.getString
+import com.mojang.brigadier.arguments.StringArgumentType.greedyString
+import it.pureorigins.common.*
+import org.apache.logging.log4j.LogManager
 import kotlinx.serialization.Serializable
+import org.bukkit.entity.Player
+
 
 class ParticleCommands(private val config: Config) {
 
-/*    val command
+    val command
         get() = literal(config.commandName) {
             requiresPermission("fancyparticles.particles")
             success { source.sendFeedback(config.commandUsage?.templateText()) }
@@ -20,27 +26,27 @@ class ParticleCommands(private val config: Config) {
             success { source.sendFeedback(config.set.commandUsage?.templateText()) }
             then(argument("particle", greedyString()) {
                 suggestions {
-                    FancyParticles.getPlayerParticles(source.player.uuid)
+                    FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
                         .map { (_, particle) -> particle.name } + config.nullparticleName
                 }
                 success {
                     val particleName = getString(this, "particle")
                     if (particleName == config.nullparticleName) {
-                        FancyParticles.setCurrentParticle(source.player.uuid, null)
-                        FancyParticles.clearTasks(source.player)
-                        return@success source.sendFeedback(config.set.success?.templateText("particle" to null))
+                        FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, null)
+                        FancyParticles.clearTasks(source.bukkitSender as Player)
+                        return@success source.sendFeedback(*config.set.success?.templateText("particle" to null))
                     }
                     val (id, particle) = FancyParticles.getParticle(particleName)
                         ?: return@success source.sendFeedback(config.set.particleNotFound?.templateText())
-                    val playerparticles = FancyParticles.getPlayerParticles(source.player.uuid)
+                    val playerparticles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
                     if (id !in playerparticles) return@success source.sendFeedback(
                         config.set.particleNotOwned?.templateText(
                             "particle" to particle
                         )
                     )
-                    FancyParticles.setCurrentParticle(source.player.uuid, id)
-                    LogManager.getLogger().info("${source.player.name} set particle to $particle")
-                    FancyParticles.scheduleParticle(particle.particleEffect, source.player)
+                    FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, id)
+                    LogManager.getLogger().info("${source.bukkitSender.name} set particle to $particle")
+                    FancyParticles.scheduleParticle(particle.particleEffect, source.bukkitSender as Player)
                     source.sendFeedback(config.set.success?.templateText("particle" to particle))
                 }
             })
@@ -50,14 +56,15 @@ class ParticleCommands(private val config: Config) {
         get() = literal(config.info.commandName) {
             requiresPermission("fancyparticles.particles.info")
             success {
-                val particles = FancyParticles.getPlayerParticles(source.player.uuid).values
-                val currentparticle = FancyParticles.getCurrentParticle(source.player.uuid)?.second
+                val particles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId).values
+                val currentparticle = FancyParticles.getCurrentParticle((source.bukkitSender as Player).uniqueId)?.second
                 source.sendFeedback(
                     config.info.message?.templateText(
                         "particles" to particles,
                         "currentparticle" to currentparticle
                     )
                 )
+                source.h()
             }
         }
 
@@ -71,10 +78,10 @@ class ParticleCommands(private val config: Config) {
                         FancyParticles.getAllNames()
                     }
                     success {
-                        val players = getPlayers(this, "targets")
+                        val players = arrayOf(getArgument("targets", Player::class.java))
                         val particleName = getString(this, "particle")
                         val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendFeedback(config.add.particleNotFound?.templateText())
-                        val success = players.filter { FancyParticles.addParticle(it.uuid, id) }
+                        val success = players.filter { FancyParticles.addParticle(it.uniqueId, id) }
                         if (success.isEmpty()) source.sendFeedback(config.add.particleAlreadyOwned?.templateText("particle" to particle))
                         else source.sendFeedback(config.add.success?.templateText("particle" to particle, "players" to players))
                     }
@@ -85,7 +92,7 @@ class ParticleCommands(private val config: Config) {
     val removeCommand
         get() = literal(config.remove.commandName) {
             requiresPermission("fancyparticles.particles.remove")
-            success { source.sendFeedback(config.remove.commandUsage?.templateText()) }
+            success { source.(config.remove.commandUsage?.templateText()) }
             then(argument("targets", players()) {
                 then(argument("particle", greedyString()) {
                     suggestions {
@@ -103,7 +110,7 @@ class ParticleCommands(private val config: Config) {
                     }
                 })
             })
-        }*/
+        }
 
     @Serializable
     data class Config(

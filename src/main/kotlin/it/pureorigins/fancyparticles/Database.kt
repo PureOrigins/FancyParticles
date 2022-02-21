@@ -2,7 +2,6 @@ package it.pureorigins.fancyparticles
 
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
-import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import org.jetbrains.exposed.sql.*
 import java.util.*
@@ -30,7 +29,7 @@ object PlayersTable : Table("players") {
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
     get(ParticlesTable.name),
-    TextComponent(*ComponentSerializer.parse(get(ParticlesTable.title))),
+    arrayOf(*ComponentSerializer.parse(get(ParticlesTable.title))),
     ParticleEffects.fromString(get(ParticlesTable.string_id))
 )
 

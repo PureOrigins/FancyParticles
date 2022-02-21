@@ -1,9 +1,9 @@
 package it.pureorigins.fancyparticles
 
+import it.pureorigins.common.json
+import it.pureorigins.common.readFileAs
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffect
-import it.pureorigins.framework.configuration.json
-import it.pureorigins.framework.configuration.readFileAs
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -15,6 +15,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+
 
 object FancyParticles : JavaPlugin() {
 
@@ -39,7 +40,7 @@ object FancyParticles : JavaPlugin() {
     private lateinit var scheduler: ScheduledExecutorService
     private lateinit var database: Database
     override fun onEnable() {
-        val (db, commands) = json.readFileAs(it.pureorigins.framework.configuration.configFile("fancyparticles.json"), Config())
+        val (db, commands) = json.readFileAs(configFile("fancyparticles.json"), Config())
         scheduler = Executors.newScheduledThreadPool(4)
         require(db.url.isNotEmpty()) { "Database url is empty" }
         database = Database.connect(db.url, user = db.username, password = db.password)

@@ -28,19 +28,16 @@ repositories {
     */
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://oss.sonatype.org/content/repositories/central")
-    mavenLocal() // This is needed for CraftBukkit and Spigot.
+    maven("https://repo.codemc.io/repository/nms/")
+    maven("https://libraries.minecraft.net/")
     mavenCentral()
 }
 
 dependencies {
     val spigotVersion: String by project
-    compileOnly("org.spigotmc:spigot-api:$spigotVersion")
-    val configurationVersion: String by project
-    compileOnly("com.github.PureOrigins:PureConfiguration:$configurationVersion")
-    val databaseVersion: String by project
-    compileOnly("com.github.PureOrigins:Database:$databaseVersion")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    compileOnly("org.spigotmc:spigot:$spigotVersion")
+    val commonVersion: String by project
+    compileOnly("com.github.PureOrigins:PureCommon:$commonVersion")
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
