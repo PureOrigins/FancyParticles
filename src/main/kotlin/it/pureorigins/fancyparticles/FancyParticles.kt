@@ -1,5 +1,6 @@
 package it.pureorigins.fancyparticles
 
+import it.pureorigins.common.file
 import it.pureorigins.common.json
 import it.pureorigins.common.readFileAs
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
@@ -40,7 +41,7 @@ object FancyParticles : JavaPlugin() {
     private lateinit var scheduler: ScheduledExecutorService
     private lateinit var database: Database
     override fun onEnable() {
-        val (db, commands) = json.readFileAs(configFile("fancyparticles.json"), Config())
+        val (db, commands) = json.readFileAs(file("fancyparticles.json"), Config())
         scheduler = Executors.newScheduledThreadPool(4)
         require(db.url.isNotEmpty()) { "Database url is empty" }
         database = Database.connect(db.url, user = db.username, password = db.password)

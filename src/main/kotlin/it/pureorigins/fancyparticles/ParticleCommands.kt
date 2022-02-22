@@ -3,8 +3,10 @@ package it.pureorigins.fancyparticles
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import it.pureorigins.common.*
-import org.apache.logging.log4j.LogManager
 import kotlinx.serialization.Serializable
+import net.minecraft.commands.arguments.EntityArgument.getPlayers
+import net.minecraft.commands.arguments.EntityArgument.players
+import org.apache.logging.log4j.LogManager
 import org.bukkit.entity.Player
 
 
@@ -13,7 +15,7 @@ class ParticleCommands(private val config: Config) {
     val command
         get() = literal(config.commandName) {
             requiresPermission("fancyparticles.particles")
-            success { source.sendFeedback(config.commandUsage?.templateText()) }
+            success { source.bukkitSender.sendMessage(config.commandUsage?.templateText()) }
             then(setCommand)
             then(infoCommand)
             then(addCommand)
@@ -23,7 +25,7 @@ class ParticleCommands(private val config: Config) {
     val setCommand
         get() = literal(config.set.commandName) {
             requiresPermission("fancyparticles.particles.set")
-            success { source.sendFeedback(config.set.commandUsage?.templateText()) }
+            success { source.bukkitSender.sendMessage(config.set.commandUsage?.templateText()) }
             then(argument("particle", greedyString()) {
                 suggestions {
                     FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
@@ -34,12 +36,12 @@ class ParticleCommands(private val config: Config) {
                     if (particleName == config.nullparticleName) {
                         FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, null)
                         FancyParticles.clearTasks(source.bukkitSender as Player)
-                        return@success source.sendFeedback(*config.set.success?.templateText("particle" to null))
+                        return@success source.bukkitSender.sendMessage(config.set.success?.templateText("particle" to null))
                     }
                     val (id, particle) = FancyParticles.getParticle(particleName)
-                        ?: return@success source.sendFeedback(config.set.particleNotFound?.templateText())
+                        ?: return@success source.bukkitSender.sendMessage(config.set.particleNotFound?.templateText())
                     val playerparticles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
-                    if (id !in playerparticles) return@success source.sendFeedback(
+                    if (id !in playerparticles) return@success source.bukkitSender.sendMessage(
                         config.set.particleNotOwned?.templateText(
                             "particle" to particle
                         )
@@ -47,7 +49,7 @@ class ParticleCommands(private val config: Config) {
                     FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, id)
                     LogManager.getLogger().info("${source.bukkitSender.name} set particle to $particle")
                     FancyParticles.scheduleParticle(particle.particleEffect, source.bukkitSender as Player)
-                    source.sendFeedback(config.set.success?.templateText("particle" to particle))
+                    source.bukkitSender.sendMessage(config.set.success?.templateText("particle" to particle))
                 }
             })
         }
@@ -58,41 +60,19 @@ class ParticleCommands(private val config: Config) {
             success {
                 val particles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId).values
                 val currentparticle = FancyParticles.getCurrentParticle((source.bukkitSender as Player).uniqueId)?.second
-                source.sendFeedback(
+                source.bukkitSender.sendMessage(
                     config.info.message?.templateText(
                         "particles" to particles,
                         "currentparticle" to currentparticle
                     )
                 )
-                source.h()
             }
         }
 
     val addCommand
         get() = literal(config.add.commandName) {
             requiresPermission("fancyparticles.particles.add")
-            success { source.sendFeedback(config.add.commandUsage?.templateText()) }
-            then(argument("targets", players()) {
-                then(argument("particle", greedyString()) {
-                    suggestions {
-                        FancyParticles.getAllNames()
-                    }
-                    success {
-                        val players = arrayOf(getArgument("targets", Player::class.java))
-                        val particleName = getString(this, "particle")
-                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendFeedback(config.add.particleNotFound?.templateText())
-                        val success = players.filter { FancyParticles.addParticle(it.uniqueId, id) }
-                        if (success.isEmpty()) source.sendFeedback(config.add.particleAlreadyOwned?.templateText("particle" to particle))
-                        else source.sendFeedback(config.add.success?.templateText("particle" to particle, "players" to players))
-                    }
-                })
-            })
-        }
-
-    val removeCommand
-        get() = literal(config.remove.commandName) {
-            requiresPermission("fancyparticles.particles.remove")
-            success { source.(config.remove.commandUsage?.templateText()) }
+            success { source.bukkitSender.sendMessage(config.add.commandUsage?.templateText()) }
             then(argument("targets", players()) {
                 then(argument("particle", greedyString()) {
                     suggestions {
@@ -101,12 +81,33 @@ class ParticleCommands(private val config: Config) {
                     success {
                         val players = getPlayers(this, "targets")
                         val particleName = getString(this, "particle")
-                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendFeedback(config.remove.particleNotFound?.templateText())
+                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.bukkitSender.sendMessage(config.add.particleNotFound?.templateText())
+                        val success = players.filter { FancyParticles.addParticle(it.uuid, id) }
+                        if (success.isEmpty()) source.bukkitSender.sendMessage(config.add.particleAlreadyOwned?.templateText("particle" to particle))
+                        else source.bukkitSender.sendMessage(config.add.success?.templateText("particle" to particle, "players" to players))
+                    }
+                })
+            })
+        }
+
+    val removeCommand
+        get() = literal(config.remove.commandName) {
+            requiresPermission("fancyparticles.particles.remove")
+            success { source.bukkitSender.sendMessage(config.remove.commandUsage?.templateText()) }
+            then(argument("targets", players()) {
+                then(argument("particle", greedyString()) {
+                    suggestions {
+                        FancyParticles.getAllNames()
+                    }
+                    success {
+                        val players = getPlayers(this, "targets")
+                        val particleName = getString(this, "particle")
+                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.bukkitSender.sendMessage(config.remove.particleNotFound?.templateText())
                         val success = players.filter {
                             FancyParticles.removeParticle(it.uuid, id)
                         }
-                        if (success.isEmpty()) source.sendFeedback(config.remove.particleNotOwned?.templateText("particle" to particle))
-                        else source.sendFeedback(config.remove.success?.templateText("particle" to particle, "players" to players))
+                        if (success.isEmpty()) source.bukkitSender.sendMessage(config.remove.particleNotOwned?.templateText("particle" to particle))
+                        else source.bukkitSender.sendMessage(config.remove.success?.templateText("particle" to particle, "players" to players))
                     }
                 })
             })

@@ -4,6 +4,7 @@ plugins {
     val kotlinVersion: String by System.getProperties()
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
+    id("io.papermc.paperweight.userdev") version "1.3.4"
 }
 base {
     val archivesBaseName: String by project
@@ -35,7 +36,7 @@ repositories {
 
 dependencies {
     val spigotVersion: String by project
-    compileOnly("org.spigotmc:spigot:$spigotVersion")
+    paperDevBundle(spigotVersion)
     val commonVersion: String by project
     compileOnly("com.github.PureOrigins:PureCommon:$commonVersion")
 }
