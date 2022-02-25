@@ -1,5 +1,6 @@
 package it.pureorigins.fancyparticles
 
+import it.pureorigins.common.paperTextFromJson
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
 import net.md_5.bungee.chat.ComponentSerializer
@@ -29,7 +30,7 @@ object PlayersTable : Table("players") {
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
     get(ParticlesTable.name),
-    arrayOf(*ComponentSerializer.parse(get(ParticlesTable.title))),
+    paperTextFromJson(get(ParticlesTable.title)),
     ParticleEffects.fromString(get(ParticlesTable.string_id))
 )
 

@@ -19,28 +19,50 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 
-object FancyParticles : JavaPlugin() {
+class FancyParticles : JavaPlugin() {
+    companion object {
+        private lateinit var scheduler: ScheduledExecutorService
+        private lateinit var database: Database
 
-    private val playerTasks = HashMap<UUID, ArrayList<ScheduledFuture<*>>>()
-    fun getParticle(id: Int): NamedParticleEffect? = transaction(database) { ParticlesTable.getById(id) }
-    fun getParticle(name: String): Pair<Int, NamedParticleEffect>? =
-        transaction(database) { ParticlesTable.getByName(name) }
-    fun getAllNames(): Set<String> = transaction(database) { ParticlesTable.getAllNames() }
-    fun addParticle(playerUniqueId: UUID, particleId: Int): Boolean = transaction(database) { PlayerParticlesTable.add(playerUniqueId, particleId) }
-    fun removeParticle(playerUniqueId: UUID, particleId: Int): Boolean = transaction(database) { PlayerParticlesTable.remove(playerUniqueId, particleId) }
-    fun getPlayerParticles(playerUniqueId: UUID): Map<Int, NamedParticleEffect> =
-        transaction(database) { PlayerParticlesTable.getParticles(playerUniqueId) }
+        private val playerTasks = HashMap<UUID, ArrayList<ScheduledFuture<*>>>()
+        fun getParticle(id: Int): NamedParticleEffect? = transaction(database) { ParticlesTable.getById(id) }
+        fun getParticle(name: String): Pair<Int, NamedParticleEffect>? =
+            transaction(database) { ParticlesTable.getByName(name) }
 
-    fun getPlayersCount(): Long = transaction(database) { PlayersTable.count() }
-    fun getCurrentParticle(playerUniqueId: UUID): Pair<Int, NamedParticleEffect>? =
-        transaction(database) { PlayersTable.getCurrentParticle(playerUniqueId) }
+        fun getAllNames(): Set<String> = transaction(database) { ParticlesTable.getAllNames() }
+        fun addParticle(playerUniqueId: UUID, particleId: Int): Boolean =
+            transaction(database) { PlayerParticlesTable.add(playerUniqueId, particleId) }
 
-    fun setCurrentParticle(playerUniqueId: UUID, particleId: Int?): Boolean =
-        transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, particleId) }
+        fun removeParticle(playerUniqueId: UUID, particleId: Int): Boolean =
+            transaction(database) { PlayerParticlesTable.remove(playerUniqueId, particleId) }
 
+        fun getPlayerParticles(playerUniqueId: UUID): Map<Int, NamedParticleEffect> =
+            transaction(database) { PlayerParticlesTable.getParticles(playerUniqueId) }
 
-    private lateinit var scheduler: ScheduledExecutorService
-    private lateinit var database: Database
+        fun getPlayersCount(): Long = transaction(database) { PlayersTable.count() }
+        fun getCurrentParticle(playerUniqueId: UUID): Pair<Int, NamedParticleEffect>? =
+            transaction(database) { PlayersTable.getCurrentParticle(playerUniqueId) }
+
+        fun setCurrentParticle(playerUniqueId: UUID, particleId: Int?): Boolean =
+            transaction(database) { PlayersTable.setCurrentParticle(playerUniqueId, particleId) }
+
+        fun scheduleParticle(particleEffect: ParticleEffect, player: Player) {
+            clearTasks(player)
+            playerTasks[player.uniqueId] = ArrayList()
+            for (part in particleEffect.particleParts) {
+                val task = ParticleTask(part, player)
+                val t = scheduler.scheduleAtFixedRate(task, part.delay * 50, part.period * 50, TimeUnit.MILLISECONDS)
+                playerTasks[player.uniqueId]?.add(t)
+            }
+        }
+
+        fun clearTasks(player: Player) {
+            if (playerTasks.containsKey(player.uniqueId))
+                for (t in playerTasks[player.uniqueId]!!) t.cancel(false)
+            playerTasks.remove(player.uniqueId)
+        }
+    }
+
     override fun onEnable() {
         val (db, commands) = json.readFileAs(file("fancyparticles.json"), Config())
         registerCommand(ParticleCommands(commands).command)
@@ -50,23 +72,6 @@ object FancyParticles : JavaPlugin() {
         transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable, PlayerParticlesTable) }
 
     }
-
-    fun scheduleParticle(particleEffect: ParticleEffect, player: Player) {
-        clearTasks(player)
-        playerTasks[player.uniqueId] = ArrayList()
-        for (part in particleEffect.particleParts) {
-            val task = ParticleTask(part, player)
-            val t = scheduler.scheduleAtFixedRate(task, part.delay * 50, part.period * 50, TimeUnit.MILLISECONDS)
-            playerTasks[player.uniqueId]?.add(t)
-        }
-    }
-
-    fun clearTasks(player: Player) {
-        if (playerTasks.containsKey(player.uniqueId))
-            for (t in playerTasks[player.uniqueId]!!) t.cancel(false)
-        playerTasks.remove(player.uniqueId)
-    }
-
 
     @Serializable
     data class Config(
