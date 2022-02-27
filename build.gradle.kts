@@ -10,6 +10,8 @@ bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.${project.name.toLowerCase()}.${project.name}"
+    apiVersion = "1.18"
+    depend = listOf("PureCommon")
 }
 
 repositories {
