@@ -1,10 +1,13 @@
 plugins {
-    val kotlinVersion: String by System.getProperties()
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.serialization") version kotlinVersion
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("io.papermc.paperweight.userdev") version "1.3.4"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    `maven-publish`
 }
+
+group = "it.pureorigins"
+version = "1.0.0"
 
 bukkit {
     name = project.name
@@ -15,15 +18,33 @@ bukkit {
 }
 
 repositories {
-    maven("https://jitpack.io")
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    val spigotVersion: String by project
-    paperDevBundle(spigotVersion)
-    val commonVersion: String by project
-    compileOnly("com.github.PureOrigins:PureCommon:$commonVersion")
+    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
+    compileOnly("com.github.PureOrigins:PureCommon:0.3.7")
+}
+
+afterEvaluate {
+    tasks {
+        jar {
+            archiveClassifier.set("")
+        }
+
+        reobfJar {
+            outputJar.set(jar.get().archiveFile)
+        }
+
+        build {
+            dependsOn(reobfJar)
+        }
+
+        compileKotlin {
+            kotlinOptions.jvmTarget = "17"
+        }
+    }
 }
 
 kotlin {
@@ -32,14 +53,17 @@ kotlin {
     }
 }
 
-afterEvaluate {
-    tasks {
-        reobfJar {
-            outputJar.set(jar.get().archiveFile)
-        }
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.PureOrigins"
+            artifactId = project.name
+            version = project.version.toString()
 
-        build {
-            dependsOn(reobfJar)
+            afterEvaluate {
+                from(components["kotlin"])
+                artifact(tasks["kotlinSourcesJar"])
+            }
         }
     }
 }
