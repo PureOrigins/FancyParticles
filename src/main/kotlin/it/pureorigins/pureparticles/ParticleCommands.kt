@@ -13,7 +13,7 @@ class ParticleCommands(private val config: Config) {
 
     val command
         get() = literal(config.commandName) {
-            requiresPermission("fancyparticles.particles")
+            requiresPermission("pureparticles.particles")
             success { source.sendNullableMessage(config.commandUsage?.templateText()) }
             then(setCommand)
             then(infoCommand)

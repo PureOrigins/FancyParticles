@@ -1,6 +1,7 @@
 package it.pureorigins.pureparticles
 
 import it.pureorigins.common.*
+import it.pureorigins.pureparticles.json.ComponentSerializer
 import it.pureorigins.pureparticles.particles.NamedParticleEffect
 import it.pureorigins.pureparticles.particles.ParticleEffect
 import kotlinx.serialization.Serializable
@@ -61,6 +62,7 @@ class PureParticles : JavaPlugin() {
     
     override fun onLoad() {
         plugin = this
+        ComponentSerializer.register()
     }
     
     override fun onEnable() {
