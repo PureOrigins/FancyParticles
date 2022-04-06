@@ -4,6 +4,7 @@ import it.pureorigins.common.*
 import it.pureorigins.pureparticles.particles.NamedParticleEffect
 import it.pureorigins.pureparticles.particles.ParticleEffect
 import kotlinx.serialization.Serializable
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
@@ -69,6 +70,7 @@ class PureParticles : JavaPlugin() {
         transaction(database) { createMissingTablesAndColumns(PlayersTable, ParticlesTable, PlayerParticlesTable) }
         registerEvents(Events)
         registerCommand(ParticleCommands(commands).command)
+        Bukkit.getOnlinePlayers().forEach { scheduleParticle(it, getCurrentParticle(it.uniqueId)?.second?.particleEffect) }
     }
 
     @Serializable
