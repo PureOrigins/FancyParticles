@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

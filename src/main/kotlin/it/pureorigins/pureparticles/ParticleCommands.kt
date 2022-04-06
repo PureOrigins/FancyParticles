@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString

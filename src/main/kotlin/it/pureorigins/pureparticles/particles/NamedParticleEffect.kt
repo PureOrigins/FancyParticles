@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles.particles
+package it.pureorigins.pureparticles.particles
 
 import it.pureorigins.common.Text
 

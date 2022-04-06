@@ -1,8 +1,8 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import it.pureorigins.common.runTaskTimer
-import it.pureorigins.fancyparticles.particles.ParticleEffect
-import it.pureorigins.fancyparticles.particles.ParticlePart
+import it.pureorigins.pureparticles.particles.ParticleEffect
+import it.pureorigins.pureparticles.particles.ParticlePart
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 

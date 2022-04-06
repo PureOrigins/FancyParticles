@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles.particles.shapes
+package it.pureorigins.pureparticles.particles.shapes
 
 import org.bukkit.util.Vector
 

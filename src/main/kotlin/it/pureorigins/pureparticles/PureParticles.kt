@@ -1,8 +1,8 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import it.pureorigins.common.*
-import it.pureorigins.fancyparticles.particles.NamedParticleEffect
-import it.pureorigins.fancyparticles.particles.ParticleEffect
+import it.pureorigins.pureparticles.particles.NamedParticleEffect
+import it.pureorigins.pureparticles.particles.ParticleEffect
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin

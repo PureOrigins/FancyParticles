@@ -1,9 +1,9 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import it.pureorigins.common.textFromJson
 import it.pureorigins.common.toJson
-import it.pureorigins.fancyparticles.particles.NamedParticleEffect
-import it.pureorigins.fancyparticles.particles.ParticleEffects
+import it.pureorigins.pureparticles.particles.NamedParticleEffect
+import it.pureorigins.pureparticles.particles.ParticleEffects
 import org.jetbrains.exposed.sql.*
 import java.util.*
 

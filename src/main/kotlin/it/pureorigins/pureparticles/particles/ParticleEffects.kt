@@ -1,9 +1,9 @@
-package it.pureorigins.fancyparticles.particles
+package it.pureorigins.pureparticles.particles
 
-import it.pureorigins.fancyparticles.PositionReference.FEET
-import it.pureorigins.fancyparticles.PositionReference.HEAD
-import it.pureorigins.fancyparticles.particles.shapes.OrbitalParticle
-import it.pureorigins.fancyparticles.particles.shapes.ParallelepipedParticle
+import it.pureorigins.pureparticles.PositionReference.FEET
+import it.pureorigins.pureparticles.PositionReference.HEAD
+import it.pureorigins.pureparticles.particles.shapes.OrbitalParticle
+import it.pureorigins.pureparticles.particles.shapes.ParallelepipedParticle
 import org.bukkit.Particle
 import org.bukkit.Particle.*
 import kotlin.math.PI

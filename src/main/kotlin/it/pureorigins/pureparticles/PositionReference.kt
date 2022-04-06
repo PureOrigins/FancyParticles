@@ -1,4 +1,4 @@
-package it.pureorigins.fancyparticles
+package it.pureorigins.pureparticles
 
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector

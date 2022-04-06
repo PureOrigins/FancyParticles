@@ -1,7 +1,7 @@
-package it.pureorigins.fancyparticles.particles
+package it.pureorigins.pureparticles.particles
 
-import it.pureorigins.fancyparticles.PositionReference
-import it.pureorigins.fancyparticles.particles.shapes.ParticleShape
+import it.pureorigins.pureparticles.PositionReference
+import it.pureorigins.pureparticles.particles.shapes.ParticleShape
 import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
