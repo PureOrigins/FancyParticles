@@ -6,7 +6,6 @@ import it.pureorigins.common.*
 import kotlinx.serialization.Serializable
 import net.minecraft.commands.arguments.EntityArgument.getPlayers
 import net.minecraft.commands.arguments.EntityArgument.players
-import org.apache.logging.log4j.LogManager
 import org.bukkit.entity.Player
 
 
@@ -24,31 +23,30 @@ class ParticleCommands(private val config: Config) {
 
     val setCommand
         get() = literal(config.set.commandName) {
-            requiresPermission("fancyparticles.particles.set")
+            requiresPermission("pureparticles.particles.set")
             success { source.sendNullableMessage(config.set.commandUsage?.templateText()) }
             then(argument("particle", greedyString()) {
                 suggestions {
-                    FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
-                        .map { (_, particle) -> particle.name } + config.nullparticleName
+                    plugin.getPlayerParticles(source.player.uniqueId)
+                        .map { (_, particle) -> particle.name } + config.nullParticleName
                 }
                 success {
                     val particleName = getString(this, "particle")
-                    if (particleName == config.nullparticleName) {
-                        FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, null)
-                        FancyParticles.clearTasks(source.bukkitSender as Player)
+                    if (particleName == config.nullParticleName) {
+                        plugin.setCurrentParticle(source.player.uniqueId, null)
+                        plugin.clearTasks(source.bukkitSender as Player)
                         return@success source.sendNullableMessage(config.set.success?.templateText("particle" to null))
                     }
-                    val (id, particle) = FancyParticles.getParticle(particleName)
+                    val (id, particle) = plugin.getParticle(particleName)
                         ?: return@success source.sendNullableMessage(config.set.particleNotFound?.templateText())
-                    val playerparticles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId)
-                    if (id !in playerparticles) return@success source.sendNullableMessage(
+                    val particles = plugin.getPlayerParticles(source.player.uniqueId)
+                    if (id !in particles) return@success source.sendNullableMessage(
                         config.set.particleNotOwned?.templateText(
                             "particle" to particle
                         )
                     )
-                    FancyParticles.setCurrentParticle((source.bukkitSender as Player).uniqueId, id)
-                    LogManager.getLogger().info("${source.bukkitSender.name} set particle to $particle")
-                    FancyParticles.scheduleParticle(particle.particleEffect, source.bukkitSender as Player)
+                    plugin.setCurrentParticle(source.player.uniqueId, id)
+                    plugin.scheduleParticle(source.player, particle.particleEffect)
                     source.sendNullableMessage(config.set.success?.templateText("particle" to particle))
                 }
             })
@@ -56,14 +54,14 @@ class ParticleCommands(private val config: Config) {
 
     val infoCommand
         get() = literal(config.info.commandName) {
-            requiresPermission("fancyparticles.particles.info")
+            requiresPermission("pureparticles.particles.info")
             success {
-                val particles = FancyParticles.getPlayerParticles((source.bukkitSender as Player).uniqueId).values
-                val currentparticle = FancyParticles.getCurrentParticle((source.bukkitSender as Player).uniqueId)?.second
+                val particles = plugin.getPlayerParticles(source.player.uniqueId).values
+                val currentParticles = plugin.getCurrentParticle(source.player.uniqueId)?.second
                 source.sendNullableMessage(
                     config.info.message?.templateText(
                         "particles" to particles,
-                        "currentparticle" to currentparticle
+                        "current" to currentParticles
                     )
                 )
             }
@@ -71,18 +69,18 @@ class ParticleCommands(private val config: Config) {
 
     val addCommand
         get() = literal(config.add.commandName) {
-            requiresPermission("fancyparticles.particles.add")
+            requiresPermission("pureparticles.particles.add")
             success { source.sendNullableMessage(config.add.commandUsage?.templateText()) }
             then(argument("targets", players()) {
                 then(argument("particle", greedyString()) {
                     suggestions {
-                        FancyParticles.getAllNames()
+                        plugin.getAllNames()
                     }
                     success {
                         val players = getPlayers(this, "targets")
                         val particleName = getString(this, "particle")
-                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendNullableMessage(config.add.particleNotFound?.templateText())
-                        val success = players.filter { FancyParticles.addParticle(it.uuid, id) }
+                        val (id, particle) = plugin.getParticle(particleName) ?: return@success source.sendNullableMessage(config.add.particleNotFound?.templateText())
+                        val success = players.filter { plugin.addParticle(it.uuid, id) }
                         if (success.isEmpty()) source.sendNullableMessage(config.add.particleAlreadyOwned?.templateText("particle" to particle))
                         else source.sendNullableMessage(config.add.success?.templateText("particle" to particle, "players" to players))
                     }
@@ -92,19 +90,19 @@ class ParticleCommands(private val config: Config) {
 
     val removeCommand
         get() = literal(config.remove.commandName) {
-            requiresPermission("fancyparticles.particles.remove")
+            requiresPermission("pureparticles.particles.remove")
             success { source.sendNullableMessage(config.remove.commandUsage?.templateText()) }
             then(argument("targets", players()) {
                 then(argument("particle", greedyString()) {
                     suggestions {
-                        FancyParticles.getAllNames()
+                        plugin.getAllNames()
                     }
                     success {
                         val players = getPlayers(this, "targets")
                         val particleName = getString(this, "particle")
-                        val (id, particle) = FancyParticles.getParticle(particleName) ?: return@success source.sendNullableMessage(config.remove.particleNotFound?.templateText())
+                        val (id, particle) = plugin.getParticle(particleName) ?: return@success source.sendNullableMessage(config.remove.particleNotFound?.templateText())
                         val success = players.filter {
-                            FancyParticles.removeParticle(it.uuid, id)
+                            plugin.removeParticle(it.uuid, id)
                         }
                         if (success.isEmpty()) source.sendNullableMessage(config.remove.particleNotOwned?.templateText("particle" to particle))
                         else source.sendNullableMessage(config.remove.success?.templateText("particle" to particle, "players" to players))
@@ -117,7 +115,7 @@ class ParticleCommands(private val config: Config) {
     data class Config(
         val commandName: String = "particles",
         val commandUsage: String? = "[{\"text\": \"Usage: \", \"color\": \"dark_gray\"}, {\"text\": \"/$commandName <set | info>\", \"color\": \"gray\"}]",
-        val nullparticleName: String = "none",
+        val nullParticleName: String = "none",
         val set: Set = Set(),
         val info: Info = Info(),
         val add: Add = Add(),
@@ -135,7 +133,7 @@ class ParticleCommands(private val config: Config) {
         @Serializable
         data class Info(
             val commandName: String = "info",
-            val message: String? = "[{\"text\": \"Current particle: \", \"color\": \"gray\"}, <#if currentparticle??>{\"particle\": \"\${currentparticle.name}\"}<#else>{\"text\": \"none\", \"color\": \"gray\"}</#if>, {\"text\": \"\\n\"}, {\"text\": \"\${particles?size} Owned particle<#if particles?size != 0>s</#if>: \", \"color\": \"gray\"}, <#list particles as particle>{\"particle\": \"\${particle.name}\"}<#sep>,{\"text\": \", \", \"color\": \"gray\"},</#list>]"
+            val message: String? = "[{\"text\": \"Current particle: \", \"color\": \"gray\"}, <#if current??>{\"particle\": \"\${current.name}\"}<#else>{\"text\": \"none\", \"color\": \"gray\"}</#if>, {\"text\": \"\\n\"}, {\"text\": \"\${particles?size} Owned particle<#if particles?size != 0>s</#if>: \", \"color\": \"gray\"}, <#list particles as particle>{\"particle\": \"\${particle.name}\"}<#sep>,{\"text\": \", \", \"color\": \"gray\"},</#list>]"
         )
 
         @Serializable

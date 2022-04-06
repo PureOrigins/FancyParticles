@@ -1,28 +1,42 @@
 package it.pureorigins.fancyparticles
 
+import it.pureorigins.common.runTaskTimer
+import it.pureorigins.fancyparticles.particles.ParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticlePart
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 
-class ParticleTask(private val particlePart: ParticlePart, private val player: Player) : Runnable {
-
-    var i: Int = 0
-
+class ParticleTask(val effect: ParticleEffect, val player: Player) : Runnable {
+    private lateinit var tasks: List<BukkitTask>
+    
     override fun run() {
-        if (particlePart.particleActivation.isActive(player)) {
-            val pos = particlePart.shape.getPosition(i)
-                .add(particlePart.positionReference.getPosition(player))
-                .add(particlePart.positionOffset)
-            val offset = particlePart.shape.getOffset(i)
+        tasks = effect.particleParts.map { plugin.runTaskTimer(it.delay, it.period, ParticlePartTask(it, player)::run) }
+    }
+    
+    fun cancel() {
+        tasks.forEach { it.cancel() }
+    }
+}
+
+class ParticlePartTask(private val particle: ParticlePart, private val player: Player) : Runnable {
+    private var i = 0
+    
+    override fun run(): Unit = with(particle) {
+        if (particleActivation.isActive(player)) {
+            val pos = shape.getPosition(i)
+                .add(positionOffset)
+                .add(positionReference.getPosition(player))
+            val offset = shape.getOffset(i)
             player.world.spawnParticle(
-                particlePart.particleComposition.getParticle(player, i),
+                particleComposition.getParticle(player, i),
                 pos.x,
                 pos.y,
                 pos.z,
-                particlePart.shape.getCount(i),
+                shape.getCount(i),
                 offset.x,
                 offset.y,
                 offset.z,
-                particlePart.shape.getSpeed(i)
+                shape.getSpeed(i)
             )
             i++
         } else i = 0

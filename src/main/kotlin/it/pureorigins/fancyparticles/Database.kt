@@ -1,9 +1,9 @@
 package it.pureorigins.fancyparticles
 
-import it.pureorigins.common.paperTextFromJson
+import it.pureorigins.common.textFromJson
+import it.pureorigins.common.toJson
 import it.pureorigins.fancyparticles.particles.NamedParticleEffect
 import it.pureorigins.fancyparticles.particles.ParticleEffects
-import net.md_5.bungee.chat.ComponentSerializer
 import org.jetbrains.exposed.sql.*
 import java.util.*
 
@@ -30,8 +30,8 @@ object PlayersTable : Table("players") {
 
 private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedParticleEffect(
     get(ParticlesTable.name),
-    paperTextFromJson(get(ParticlesTable.title)),
-    ParticleEffects.fromString(get(ParticlesTable.string_id))
+    textFromJson(get(ParticlesTable.title)),
+    ParticleEffects.fromId(get(ParticlesTable.effectId)) ?: error("Unknown particle effect: ${get(ParticlesTable.effectId)}"),
 )
 
 object PlayerParticlesTable : Table("player_particles_table") {
@@ -57,7 +57,7 @@ object ParticlesTable : Table("particles_table") {
     val id = integer("id").autoIncrement()
     val name = varchar("name", length = 50)
     val title = varchar("title", length = 50)
-    val string_id = varchar("string_id", length = 50)
+    val effectId = varchar("effect_id", length = 50)
     override val primaryKey = PrimaryKey(id)
 
     fun getAllNames(): Set<String> = selectAll().mapTo(HashSet()) { it[name] }
@@ -70,14 +70,14 @@ object ParticlesTable : Table("particles_table") {
 
     fun add(particle: NamedParticleEffect): Int = insert {
         it[name] = particle.name
-        it[string_id] = particle.particleEffect.stringId
-        it[title] = ComponentSerializer.toString(particle.title)
+        it[effectId] = particle.particleEffect.effectId
+        it[title] = particle.title.toJson()
     } get id
 
     fun remove(id: Int): Boolean = deleteWhere { ParticlesTable.id eq id } > 0
     fun update(id: Int, particle: NamedParticleEffect): Boolean = update({ ParticlesTable.id eq id }) {
         it[name] = particle.name
-        it[string_id] = particle.particleEffect.stringId
-        it[title] = ComponentSerializer.toString(particle.title)
+        it[effectId] = particle.particleEffect.effectId
+        it[title] = particle.title.toJson()
     } > 0
 }
