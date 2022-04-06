@@ -34,7 +34,7 @@ private fun ResultRow.toNamedParticleEffect() = get(ParticlesTable.id) to NamedP
     ParticleEffects.fromId(get(ParticlesTable.effectId)) ?: error("Unknown particle effect: ${get(ParticlesTable.effectId)}"),
 )
 
-object PlayerParticlesTable : Table("player_particles_table") {
+object PlayerParticlesTable : Table("player_particles") {
     val uniqueId = uuid("player_id") references PlayersTable.uniqueId
     val particleId = integer("particle_id") references ParticlesTable.id
     override val primaryKey = PrimaryKey(uniqueId, particleId)
@@ -53,7 +53,7 @@ object PlayerParticlesTable : Table("player_particles_table") {
     } > 0
 }
 
-object ParticlesTable : Table("particles_table") {
+object ParticlesTable : Table("particles") {
     val id = integer("id").autoIncrement()
     val name = varchar("name", length = 50)
     val title = varchar("title", length = 50)
